@@ -54,16 +54,16 @@ class Blockchain:
         while block_index < len(chain):
             block = chain[block_index]
             if block['previous_hash'] != self.hash(previous_block):
-                return False
+                return False,block_index
             previous_proof = previous_block['proof']
             proof = block['proof']
             hash_operation = hashlib.sha256(str(proof ** 2
                     - previous_proof ** 2).encode()).hexdigest()
             if hash_operation[:4] != '0000':
-                return False
+                return False,block_index
             previous_block = block
             block_index += 1
-        return True
+        return True,block_index
 
 
 # Part 2 - Mining our Blockchain
@@ -104,11 +104,11 @@ def get_chain():
 #Checking if blockchain is valid
 @app.route('/is_valid', methods=['GET'])
 def is_valid():
-    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    is_valid,block_index = blockchain.is_chain_valid(blockchain.chain)
     if is_valid:
-        response={'message':'Blockchain VALID'}
+        response={'message':'Blockchain VALID','block_index':block_index}
     else:
-        response={'message':'Blockchain INVALID.'}
+        response={'message':'Blockchain INVALID.','block_index':block_index}
     return (jsonify(response), 200)
 
 
