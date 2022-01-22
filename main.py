@@ -1,8 +1,10 @@
 # Importing libraries
 from dataclasses import dataclass
 import datetime
+from decimal import ExtendedContext
 import hashlib
 import json
+from turtle import end_fill
 from flask import Flask, jsonify
 
 # Part - 1 Building blockchain
@@ -31,9 +33,13 @@ class Blockchain:
         check_proof = False
         while check_proof is False:
             hash_operation = hashlib.sha256(
-                str(new_proof**2 - previous_proof**2).encode())  # non symmetric
+                str(new_proof**2 - previous_proof**2).encode()).hexdigest()  # non symmetric
             if hash_operation[:4] == '0000':
-                check_proof=True
+                check_proof = True
             else:
                 new_proof += 1
-        return new_proof    
+        return new_proof
+
+    def hash(self, block):
+        encoded_block = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(encoded_block).hexdigest()
